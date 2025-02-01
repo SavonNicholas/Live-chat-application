@@ -1,0 +1,115 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dino Squad Chat App</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      body {
+        font-family: "Times New Roman", Times, serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: #ffffff;
+      }
+      #chat-container {
+        width: 90%;
+        max-width: 500px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+      #messages {
+        height: 500px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        background: #fafafa;
+      }
+      #messages p {
+        margin: 0;
+        padding: 5px;
+        background: #e0e0e0;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 8px;
+      }
+      #input-container {
+        display: flex;
+        gap: 10px;
+      }
+      input[type="text"] {
+        flex: 1;
+        width: 300px;
+        padding: 10px;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px 15px;
+        background: #ff0000;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #b30000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chat-container">
+      <div id="messages"></div>
+      <div id="input-container">
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Go on and say something, big boy."
+        />
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+
+    <script>
+      const socket = io(); // Connect to server
+      const messagesDiv = document.getElementById("messages");
+      const messageInput = document.getElementById("messageInput");
+      const sendBtn = document.getElementById("sendBtn");
+
+      // has now changed to "Function to send a message"
+      function sendMessage() {
+        const message = messageInput.value.trim();
+        if (message) {
+          socket.emit("chat message", message); // Send message to server
+          messageInput.value = "";
+        }
+      }
+
+      // Event listener for the "Send" button
+      sendBtn.addEventListener("click", () => sendMessage);
+
+      // Event listener for the "Enter" key
+      messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
+
+      // Handle incoming messages
+      socket.on("chat message", (msg) => {
+        const messageElement = document.createElement("p");
+        messageElement.textContent = msg;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+    </script>
+  </body>
+</html>
